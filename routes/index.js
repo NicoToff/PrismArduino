@@ -66,7 +66,6 @@ router.post("/api/toggle", (req, res) => {
         recording = true;
         console.log(`recording: ${recording}`);
     }
-    req.preventDefault();
 });
 
 module.exports = router;
