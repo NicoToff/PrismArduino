@@ -1,0 +1,21 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model Record {
+    id      Int      @id @default(autoincrement())
+    start   DateTime @default(now())
+    mesures Mesure[]
+}
+
+model Mesure {
+    id       Int    @id @default(autoincrement())
+    mesure   Int
+    record   Record @relation(fields: [idRecord], references: [id])
+    idRecord Int
+}
