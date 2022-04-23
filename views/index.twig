@@ -3,7 +3,7 @@
 {% block body %}
 <h1>Valeur lue</h1>
 <p>Mesure : <span id="mesure-lue">---</span></p>
-<form action="/api/toggle" method="post" id="toggle-form">
+<form action="/api/toggle" method="get" id="toggle-form">
     <button type="submit" class="btn btn-primary" id="toggle-button">Start/Stop</button>
 </form>
 {% endblock %}
