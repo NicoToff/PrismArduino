@@ -21,15 +21,6 @@ let lastMesure;
 let recording = false;
 let currentRecord;
 
-// À chaque réception de donnée série ("data"), lancer la fonction qui suit
-parser.once("data", async () => {
-    const record = await prisma.record.create({
-        data: {},
-    });
-    currentRecord = record;
-    console.log(record);
-});
-
 parser.on("data", async data => {
     //    console.log(`Data: ${data}`);
     lastMesure = data;
@@ -56,6 +47,10 @@ router.post("/api/mesure", (req, res) => {
     res.json({ mesure: lastMesure });
 });
 
+router.post("/api/enregistrement", (req, res) => {
+    res.json({ enregistrement: recording });
+});
+
 router.post("/api/toggle", (req, res) => {
     if (recording) {
         recording = false;
@@ -64,8 +59,18 @@ router.post("/api/toggle", (req, res) => {
         console.log(`currentRecord: ${currentRecord}`);
     } else {
         recording = true;
+        // À chaque réception de donnée série ("data"), lancer la fonction qui suit
+        parser.once("data", async () => {
+            const record = await prisma.record.create({
+                data: {},
+            });
+            currentRecord = record;
+            console.log(record);
+        });
         console.log(`recording: ${recording}`);
+        console.log(`currentRecord: ${currentRecord}`);
     }
+    res.redirect("/");
 });
 
 module.exports = router;
