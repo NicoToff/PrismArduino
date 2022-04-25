@@ -14,24 +14,26 @@ const port = new SerialPort({
     baudRate: 9600,
 });
 
-// La lecture série se fera jusqu'à rencontrer un retour à la ligne
+// Avec "parser", la lecture série se fera jusqu'à rencontrer un retour à la ligne
 const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
 
 let lastMesure;
 let recording = false;
 let currentRecord;
+let currentMesure;
 
+// À chaque réception de données série ("data"), lancer la fonction qui suit.
 parser.on("data", async data => {
     //    console.log(`Data: ${data}`);
     lastMesure = data;
     if (recording && currentRecord != null) {
-        const mesure = await prisma.mesure.create({
+        currentMesure = await prisma.mesure.create({
             data: {
                 mesure: Number(lastMesure),
                 idRecord: currentRecord.id,
             },
         });
-        console.log(mesure);
+        console.log(currentMesure);
     }
 });
 
@@ -42,24 +44,22 @@ router.get("/", async function (req, res, next) {
     //    console.table(result);
 });
 
-/* Quand la route "/api/mesure" est demandée, on envoie lastMesure au format JSON */
-router.post("/api/mesure", (req, res) => {
-    res.json({ mesure: lastMesure });
+/* Envoie toutes les secondes l'état du boolean "recording" et la dernière mesure prise */
+router.post("/api/fetch", (req, res) => {
+    res.json({ mesure: lastMesure, enregistrement: recording, dbRecord: currentMesure });
 });
 
-router.post("/api/enregistrement", (req, res) => {
-    res.json({ enregistrement: recording });
-});
-
+/* Permet de changer l'état du boolean "recording" du côté serveur pour lancer/arrêter
+   l'enregistrement de données dans la db.
+*/
 router.post("/api/toggle", (req, res) => {
     if (recording) {
+        // TODO: Ajout heure de fin
+        // prisma.record.update()
         recording = false;
         currentRecord = null;
-        console.log(`recording: ${recording}`);
-        console.log(`currentRecord: ${currentRecord}`);
     } else {
         recording = true;
-        // À chaque réception de donnée série ("data"), lancer la fonction qui suit
         parser.once("data", async () => {
             const record = await prisma.record.create({
                 data: {},
@@ -67,8 +67,6 @@ router.post("/api/toggle", (req, res) => {
             currentRecord = record;
             console.log(record);
         });
-        console.log(`recording: ${recording}`);
-        console.log(`currentRecord: ${currentRecord}`);
     }
     res.redirect("/");
 });

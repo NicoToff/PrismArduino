@@ -8,14 +8,16 @@ datasource db {
 }
 
 model Record {
-    id      Int      @id @default(autoincrement())
-    start   DateTime @default(now())
+    id      Int       @id @default(autoincrement())
+    start   DateTime  @default(now())
+    fin     DateTime?
     mesures Mesure[]
 }
 
 model Mesure {
-    id       Int    @id @default(autoincrement())
-    mesure   Int
-    record   Record @relation(fields: [idRecord], references: [id])
-    idRecord Int
+    id         Int      @id @default(autoincrement())
+    mesure     Int
+    horodatage DateTime @default(now())
+    record     Record   @relation(fields: [idRecord], references: [id])
+    idRecord   Int
 }
