@@ -39,9 +39,13 @@ parser.on("data", async data => {
 
 /* GET home page. */
 router.get("/", async function (req, res, next) {
-    res.render("index", { serverRecording: recording });
+    res.render("index");
     //let result = await prisma.mesure.findMany({});
     //    console.table(result);
+});
+
+router.post("/", (req, res) => {
+    res.json({ serverRecording: recording });
 });
 
 /* Envoie toutes les secondes l'état du boolean "recording" et la dernière mesure prise */
@@ -55,7 +59,6 @@ router.post("/api/fetch", (req, res) => {
 router.post("/api/toggle", async (req, res) => {
     recording = req.body.recording;
     if (recording && currentRecord != null) {
-        // TODO: Ajout heure de fin
         const updatedRecord = await prisma.record.update({
             where: {
                 id: currentRecord.id,
@@ -64,6 +67,7 @@ router.post("/api/toggle", async (req, res) => {
                 fin: new Date(Date.now()),
             },
         });
+        console.log("Fin de l'enregistrement #" + currentRecord.id);
         console.log(updatedRecord);
         currentRecord = null;
     } else {
