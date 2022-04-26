@@ -1,7 +1,8 @@
 const toggleButton = document.getElementById("toggle-button");
+const toggleForm = document.querySelector("#toggle-form");
 const logger = document.querySelector("#logger");
 let buffer = "";
-console.log(buffer);
+
 // setInterval() se lance toutes les xxx millisecondes
 setInterval(() => {
     // Demander au serveur...
@@ -20,10 +21,7 @@ setInterval(() => {
                 toggleButton.classList.add("btn-danger");
                 if (response?.dbRecord != null) {
                     const date = new Date(response?.dbRecord?.horodatage);
-                    const displayDate = `${date.getFullYear()}/${
-                        date.getMonth() + 1
-                    }/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-                    buffer += `${displayDate} => ${response?.dbRecord?.mesure}\n`;
+                    buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
                     logger.textContent = buffer;
                     logger.scrollTop = logger.scrollHeight;
                 }
@@ -36,3 +34,21 @@ setInterval(() => {
         },
     });
 }, 1000);
+
+// toggleForm.addEventListener("submit", e => {
+//     e.preventDefault();
+// });
+
+/**
+ * Given a Date, returns a string with a "YYYY/MM/DD HH:mm:ss" format.
+ * @param {Date} date
+ * @returns A string in a format like so: "2022/4/26 12:54:56"
+ */
+function humanReadableDate(date) {
+    if (date == null) return "";
+    return `${date?.getFullYear()}/${
+        date?.getMonth() + 1
+    }/${date?.getDate()} ${date?.getHours()}:${date?.getMinutes()}:${
+        Number(date?.getSeconds()) < 10 ? "0" + date?.getSeconds() : date?.getSeconds()
+    }`;
+}

@@ -52,10 +52,18 @@ router.post("/api/fetch", (req, res) => {
 /* Permet de changer l'état du boolean "recording" du côté serveur pour lancer/arrêter
    l'enregistrement de données dans la db.
 */
-router.post("/api/toggle", (req, res) => {
+router.post("/api/toggle", async (req, res) => {
     if (recording) {
         // TODO: Ajout heure de fin
-        // prisma.record.update()
+        const lolilol = await prisma.record.update({
+            where: {
+                id: currentRecord.id,
+            },
+            data: {
+                fin: new Date(Date.now()),
+            },
+        });
+        console.log(lolilol);
         recording = false;
         currentRecord = null;
     } else {
