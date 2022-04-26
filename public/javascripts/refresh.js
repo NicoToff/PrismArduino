@@ -77,7 +77,7 @@ function humanReadableDate(date) {
 /**
  * Changes the aspect of a button
  * @param {HTMLButtonElement} button A button object
- * @param {string} color Valid = "red" or "green"
+ * @param {string} color Valid = "red", "green" (defaults to blue)
  * @param {string} text The new text for the button (defaults to "OK")
  */
 function changeButton(button, color, text = "OK") {
