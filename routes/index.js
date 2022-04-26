@@ -39,23 +39,24 @@ parser.on("data", async data => {
 
 /* GET home page. */
 router.get("/", async function (req, res, next) {
-    res.render("index" /*, { mesure: lastMesure } */);
+    res.render("index", { serverRecording: recording });
     //let result = await prisma.mesure.findMany({});
     //    console.table(result);
 });
 
 /* Envoie toutes les secondes l'état du boolean "recording" et la dernière mesure prise */
 router.post("/api/fetch", (req, res) => {
-    res.json({ mesure: lastMesure, enregistrement: recording, dbRecord: currentMesure });
+    res.json({ mesure: lastMesure, dbRecord: currentMesure });
 });
 
 /* Permet de changer l'état du boolean "recording" du côté serveur pour lancer/arrêter
    l'enregistrement de données dans la db.
 */
 router.post("/api/toggle", async (req, res) => {
-    if (recording) {
+    recording = req.body.recording;
+    if (recording && currentRecord != null) {
         // TODO: Ajout heure de fin
-        const lolilol = await prisma.record.update({
+        const updatedRecord = await prisma.record.update({
             where: {
                 id: currentRecord.id,
             },
@@ -63,11 +64,9 @@ router.post("/api/toggle", async (req, res) => {
                 fin: new Date(Date.now()),
             },
         });
-        console.log(lolilol);
-        recording = false;
+        console.log(updatedRecord);
         currentRecord = null;
     } else {
-        recording = true;
         parser.once("data", async () => {
             const record = await prisma.record.create({
                 data: {},
@@ -76,7 +75,6 @@ router.post("/api/toggle", async (req, res) => {
             console.log(record);
         });
     }
-    res.redirect("/");
 });
 
 module.exports = router;
