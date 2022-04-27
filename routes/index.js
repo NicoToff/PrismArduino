@@ -19,21 +19,21 @@ const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
 
 let lastMesure;
 let recording = false;
-let currentRecord;
-let currentMesure;
+let dbCurrentRecord = null;
+let dbMesure = null;
 
-// À chaque réception de données série ("data"), lancer la fonction qui suit.
+/* À chaque réception de données série ("data"), lancer la fonction qui suit. */
 parser.on("data", async data => {
     //    console.log(`Data: ${data}`);
     lastMesure = data;
-    if (recording && currentRecord != null) {
-        currentMesure = await prisma.mesure.create({
+    if (recording && dbCurrentRecord != null) {
+        dbMesure = await prisma.mesure.create({
             data: {
                 mesure: Number(lastMesure),
-                idRecord: currentRecord.id,
+                idRecord: dbCurrentRecord.id,
             },
         });
-        console.log(currentMesure);
+        console.log(dbMesure);
     }
 });
 
@@ -50,35 +50,37 @@ router.post("/", (req, res) => {
 
 /* Envoie toutes les secondes l'état du boolean "recording" et la dernière mesure prise */
 router.post("/api/fetch", (req, res) => {
-    res.json({ mesure: lastMesure, dbRecord: currentMesure });
+    res.json({ mesure: lastMesure, dbRecord: dbMesure });
 });
 
 /* Permet de changer l'état du boolean "recording" du côté serveur pour lancer/arrêter
    l'enregistrement de données dans la db.
 */
 router.post("/api/toggle", async (req, res) => {
-    recording = req.body.recording;
-    if (recording && currentRecord != null) {
+    if (recording && dbCurrentRecord != null) {
         const updatedRecord = await prisma.record.update({
             where: {
-                id: currentRecord.id,
+                id: dbCurrentRecord.id,
             },
             data: {
                 fin: new Date(Date.now()),
             },
         });
-        console.log("Fin de l'enregistrement #" + currentRecord.id);
+        console.log("==> Fin de l'enregistrement #" + dbCurrentRecord.id);
         console.log(updatedRecord);
-        currentRecord = null;
+        dbCurrentRecord = null;
+        dbMesure = null;
     } else {
         parser.once("data", async () => {
             const record = await prisma.record.create({
                 data: {},
             });
-            currentRecord = record;
+            dbCurrentRecord = record;
+            console.log("==> Début de l'enregistrement #" + dbCurrentRecord.id);
             console.log(record);
         });
     }
+    recording = req.body.recording;
 });
 
 module.exports = router;

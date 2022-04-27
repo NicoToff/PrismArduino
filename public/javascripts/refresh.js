@@ -2,10 +2,11 @@ const toggleButton = document.getElementById("toggle-button");
 toggleButton.setAttribute("disabled", true);
 const toggleForm = document.querySelector("#toggle-form");
 const logger = document.querySelector("#logger");
+const mesureLue = document.getElementById("mesure-lue");
+const txtEnregistrement = document.getElementById("enregistrement");
+
 let buffer = "";
 let activity = { recording: false };
-// TODO set this to current server value
-// console.log("Activity:" + activity.recording);
 
 $.ajax({
     type: "post",
@@ -13,10 +14,10 @@ $.ajax({
     dataType: "json",
     success: function (response) {
         activity.recording = response.serverRecording;
-        console.log("Client: " + activity.recording);
-        console.log("Response: " + response.serverRecording);
         if (activity.recording) {
-            $("#enregistrement").text("En cours...");
+            txtEnregistrement.textContent = "En cours...";
+            /* In jQuery */
+            // $("#enregistrement").text("En cours...");
             changeButton(toggleButton, "red", "Arrêter");
         }
         main();
@@ -24,38 +25,74 @@ $.ajax({
 });
 
 function main() {
-    // setInterval() se lance toutes les xxx millisecondes
+    // setInterval() se lance toutes les xxx millisecondes; ici 1000
     setInterval(() => {
         // Demander au serveur...
-        $.ajax({
-            type: "post",
-            url: "/api/fetch",
-            dataType: "json",
-            success: function (response) {
-                // ... la dernière mesure prise et l'affiche ...
-                $("#mesure-lue").text(response.mesure);
-                // ... réactive le bouton.
-                toggleButton.removeAttribute("disabled");
-
-                if (activity.recording && response?.dbRecord != null) {
-                    const date = new Date(response.dbRecord?.horodatage);
-                    buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
-                    logger.textContent = buffer;
-                    logger.scrollTop = logger.scrollHeight;
+        let serverRequest = new XMLHttpRequest();
+        serverRequest.onreadystatechange = () => {
+            if (serverRequest.readyState === 4) {
+                let response;
+                try {
+                    response = JSON.parse(serverRequest.response);
+                    mesureLue.textContent = response?.mesure;
+                    toggleButton.removeAttribute("disabled");
+                    if (activity.recording && response?.dbRecord != null) {
+                        const date = new Date(response.dbRecord?.horodatage);
+                        buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
+                        logger.textContent = buffer;
+                        logger.scrollTop = logger.scrollHeight;
+                    }
+                } catch (error) {
+                    response = {};
+                    mesureLue.innerHTML = "<small>Server unreachable</small> ";
+                    toggleButton.setAttribute("disabled", true);
                 }
-            },
-        });
+            }
+        };
+        serverRequest.open("POST", "/api/fetch", true);
+        serverRequest.setRequestHeader("Content-type", "application/json");
+        serverRequest.send();
+        /* In jQuery */
+        // $.ajax({
+        //     type: "post",
+        //     url: "/api/fetch",
+        //     dataType: "json",
+        //     success: function (response) {
+        //         // ... la dernière mesure prise et l'affiche ...
+        //         $("#mesure-lue").text(response.mesure);
+        //         // ... réactive le bouton.
+        //         toggleButton.removeAttribute("disabled");
+
+        //         if (activity.recording && response?.dbRecord != null) {
+        //             const date = new Date(response.dbRecord?.horodatage);
+        //             buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
+        //             logger.textContent = buffer;
+        //             logger.scrollTop = logger.scrollHeight;
+        //         }
+        //     },
+        // });
     }, 1000);
 
-    $("#toggle-button").click(function () {
+    toggleButton.addEventListener("click", () => {
         toggleButton.setAttribute("disabled", true);
         activity.recording = !activity.recording;
-        $.post("/api/toggle", activity);
+
+        let postActivity = new XMLHttpRequest();
+        postActivity.open("POST", "/api/toggle", true);
+        postActivity.setRequestHeader("Content-type", "application/json");
+        postActivity.send(JSON.stringify(activity));
+        /* In jQuery */
+        // $.post("/api/toggle", activity);
+
         if (activity.recording) {
-            $("#enregistrement").text("En cours...");
+            txtEnregistrement.textContent = "En cours...";
+            /* In jQuery */
+            // $("#enregistrement").text("En cours...");
             changeButton(toggleButton, "red", "Arrêter");
         } else {
-            $("#enregistrement").text("Arrêt");
+            txtEnregistrement.textContent = "Arrêt";
+            /* In jQuery */
+            // $("#enregistrement").text("Arrêt");
             changeButton(toggleButton, "green", "Démarrer");
         }
     });
@@ -74,6 +111,7 @@ function humanReadableDate(date) {
             Number(date?.getMinutes()) < 10 ? "0" + date?.getMinutes() : date?.getMinutes()}:${
             Number(date?.getSeconds()) < 10 ? "0" + date?.getSeconds() : date?.getSeconds()}`;
 }
+
 /**
  * Changes the aspect of a button
  * @param {HTMLButtonElement} button A button object
