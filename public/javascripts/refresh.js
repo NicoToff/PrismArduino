@@ -8,21 +8,44 @@ const txtEnregistrement = document.getElementById("enregistrement");
 let buffer = "";
 let activity = { recording: false };
 
-$.ajax({
-    type: "post",
-    url: "/",
-    dataType: "json",
-    success: function (response) {
-        activity.recording = response.serverRecording;
-        if (activity.recording) {
-            txtEnregistrement.textContent = "En cours...";
-            /* In jQuery */
-            // $("#enregistrement").text("En cours...");
-            changeButton(toggleButton, "red", "Arrêter");
+let serverRequest;
+serverRequest = new XMLHttpRequest();
+serverRequest.onreadystatechange = () => {
+    if (serverRequest.readyState === 4) {
+        try {
+            let response = JSON.parse(serverRequest.response);
+            activity.recording = response.serverRecording;
+            if (activity.recording) {
+                txtEnregistrement.textContent = "En cours...";
+                /* In jQuery */
+                // $("#enregistrement").text("En cours...");
+                changeButton(toggleButton, "red", "Arrêter");
+            }
+            main();
+        } catch (error) {
+            location.reload();
         }
-        main();
-    },
-});
+    }
+};
+serverRequest.open("POST", "/", true);
+serverRequest.setRequestHeader("Content-type", "application/json");
+serverRequest.send();
+
+// $.ajax({
+//     type: "post",
+//     url: "/",
+//     dataType: "json",
+//     success: function (response) {
+//         activity.recording = response.serverRecording;
+//         if (activity.recording) {
+//             txtEnregistrement.textContent = "En cours...";
+//             /* In jQuery */
+//             // $("#enregistrement").text("En cours...");
+//             changeButton(toggleButton, "red", "Arrêter");
+//         }
+//         main();
+//     },
+// });
 
 function main() {
     // setInterval() se lance toutes les xxx millisecondes; ici 1000

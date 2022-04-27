@@ -44,6 +44,13 @@ router.get("/", async function (req, res, next) {
     //    console.table(result);
 });
 
+/* GET db page. */
+router.get("/db", async function (req, res, next) {
+    res.render("db");
+    //let result = await prisma.mesure.findMany({});
+    //    console.table(result);
+});
+
 router.post("/", (req, res) => {
     res.json({ serverRecording: recording });
 });
@@ -81,6 +88,17 @@ router.post("/api/toggle", async (req, res) => {
         });
     }
     recording = req.body.recording;
+});
+
+router.post("/api/db", async (req, res) => {
+    const searchId = req.body.search;
+    const mesuresFound = await prisma.mesure.findMany({
+        where: {
+            idRecord: searchId,
+        },
+    });
+    console.table(mesuresFound);
+    res.json(mesuresFound);
 });
 
 module.exports = router;

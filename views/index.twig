@@ -1,15 +1,17 @@
 {% extends 'layout.twig' %}
 
+{% block scripts %}
+<script defer src="/javascripts/refresh.js"></script>
+{% endblock scripts %}
+
 {% block body %}
-<h1>Valeur lue</h1>
-<p>Mesure : <span id="mesure-lue"><small>Loading</small></span></p>
+<h1>Enregistrement</h1>
+<p>Mesure reçue : <span id="mesure-lue"><small>Loading</small></span></p>
 <p>Enregistrement : <span id="enregistrement">Arrêt</span></p>
-{# <form action="/api/toggle" method="post" id="toggle-form"> #}
-    <div>
-        <button class="btn btn-success" id="toggle-button">Démarrer</button>
-    </div>
-    {#
-</form> #}
-<textarea class="mt-3" id="logger" cols="30" rows="10" readonly placeholder="Pas de données à afficher"
+<div>
+    <button class="btn btn-success" id="toggle-button">Démarrer</button>
+</div>
+<div class="mt-3">Nouvelles entrées</div>
+<textarea name="logger" id="logger" cols="30" rows="10" readonly placeholder="Pas de données à afficher"
     style="resize:none"></textarea>
 {% endblock %}
