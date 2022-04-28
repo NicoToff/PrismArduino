@@ -32,7 +32,9 @@
                 <td>{{ record.remarques }}</td>
                 <td name="button-area">
                     <a class="btn btn-warning" href="/db/{{record.id}}">&#x1F50E;</a>
-                    <a class="btn btn-danger">&#x1F5D1;</a>
+                    <form action="/db/{{record.id}}?_method=DELETE" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">&#x1F5D1;</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}

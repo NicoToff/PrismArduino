@@ -31,7 +31,29 @@ router.get("/:id", async (req, res) => {
         });
         res.render("detail", { mesures: mesuresFound, record: recordFound });
     } catch (error) {
-        res.redirect("/");
+        res.redirect("/db");
+    }
+});
+
+router.delete("/:id", async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+        const mesuresFound = await prisma.mesure.deleteMany({
+            where: {
+                idRecord: id,
+            },
+        });
+        const recordFound = await prisma.record.delete({
+            where: {
+                id: id,
+            },
+        });
+        console.table(mesuresFound);
+        console.log(recordFound);
+        res.redirect("/db");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/db");
     }
 });
 // router.post("/api/db", async (req, res) => {
