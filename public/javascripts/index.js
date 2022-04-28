@@ -1,12 +1,12 @@
-const toggleButton = document.getElementById("toggle-button");
-toggleButton.setAttribute("disabled", true);
-const toggleForm = document.querySelector("#toggle-form");
-const logger = document.querySelector("#logger");
-const mesureLue = document.getElementById("mesure-lue");
-const txtEnregistrement = document.getElementById("enregistrement");
+const btnToggle = document.getElementById("toggle-button");
+btnToggle.setAttribute("disabled", true);
+const txtNewEntries = document.querySelector("#logger");
+const lblMesureLue = document.getElementById("mesure-lue");
+const txtNotes = document.getElementById("notes");
+const lblEnregistrement = document.getElementById("enregistrement");
 
-let buffer = "";
-let activity = { recording: false };
+let newEntriesBuffer = "";
+let recording; // Boolean
 
 let serverRequest;
 serverRequest = new XMLHttpRequest();
@@ -14,12 +14,12 @@ serverRequest.onreadystatechange = () => {
     if (serverRequest.readyState === 4) {
         try {
             let response = JSON.parse(serverRequest.response);
-            activity.recording = response.serverRecording;
-            if (activity.recording) {
-                txtEnregistrement.textContent = "En cours...";
+            recording = response.serverRecording;
+            if (recording) {
+                lblEnregistrement.textContent = "En cours...";
                 /* In jQuery */
                 // $("#enregistrement").text("En cours...");
-                changeButton(toggleButton, "red", "Arrêter");
+                changeButton(btnToggle, "red", "Arrêter");
             }
             main();
         } catch (error) {
@@ -36,8 +36,8 @@ serverRequest.send();
 //     url: "/",
 //     dataType: "json",
 //     success: function (response) {
-//         activity.recording = response.serverRecording;
-//         if (activity.recording) {
+//         recording = response.serverRecording;
+//         if (recording) {
 //             txtEnregistrement.textContent = "En cours...";
 //             /* In jQuery */
 //             // $("#enregistrement").text("En cours...");
@@ -55,20 +55,21 @@ function main() {
         serverRequest.onreadystatechange = () => {
             if (serverRequest.readyState === 4) {
                 let response;
+                //                console.log(`Server's recording: ${JSON.parse(serverRequest.response).currentState}`);
                 try {
                     response = JSON.parse(serverRequest.response);
-                    mesureLue.textContent = response?.mesure;
-                    toggleButton.removeAttribute("disabled");
-                    if (activity.recording && response?.dbRecord != null) {
+                    lblMesureLue.textContent = response?.mesure;
+                    btnToggle.removeAttribute("disabled");
+                    if (recording && response?.dbRecord != null) {
                         const date = new Date(response.dbRecord?.horodatage);
-                        buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
-                        logger.textContent = buffer;
-                        logger.scrollTop = logger.scrollHeight;
+                        newEntriesBuffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
+                        txtNewEntries.textContent = newEntriesBuffer;
+                        txtNewEntries.scrollTop = txtNewEntries.scrollHeight; // Scroll to bottom
                     }
                 } catch (error) {
                     response = {};
-                    mesureLue.innerHTML = "<small>Server unreachable</small> ";
-                    toggleButton.setAttribute("disabled", true);
+                    lblMesureLue.innerHTML = "<small>Server unreachable</small> ";
+                    btnToggle.setAttribute("disabled", true);
                 }
             }
         };
@@ -86,7 +87,7 @@ function main() {
         //         // ... réactive le bouton.
         //         toggleButton.removeAttribute("disabled");
 
-        //         if (activity.recording && response?.dbRecord != null) {
+        //         if (recording && response?.dbRecord != null) {
         //             const date = new Date(response.dbRecord?.horodatage);
         //             buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
         //             logger.textContent = buffer;
@@ -96,27 +97,27 @@ function main() {
         // });
     }, 1000);
 
-    toggleButton.addEventListener("click", () => {
-        toggleButton.setAttribute("disabled", true);
-        activity.recording = !activity.recording;
+    btnToggle.addEventListener("click", () => {
+        btnToggle.setAttribute("disabled", true);
+        recording = !recording;
 
         let postActivity = new XMLHttpRequest();
         postActivity.open("POST", "/api/toggle", true);
         postActivity.setRequestHeader("Content-type", "application/json");
-        postActivity.send(JSON.stringify(activity));
+        postActivity.send(JSON.stringify({ clientRecording: recording, notes: txtNotes.value }));
         /* In jQuery */
-        // $.post("/api/toggle", activity);
+        // $.post("/api/toggle", {activity: recording});
 
-        if (activity.recording) {
-            txtEnregistrement.textContent = "En cours...";
+        if (recording) {
+            lblEnregistrement.textContent = "En cours...";
             /* In jQuery */
             // $("#enregistrement").text("En cours...");
-            changeButton(toggleButton, "red", "Arrêter");
+            changeButton(btnToggle, "red", "Arrêter");
         } else {
-            txtEnregistrement.textContent = "Arrêt";
+            lblEnregistrement.textContent = "Arrêt";
             /* In jQuery */
             // $("#enregistrement").text("Arrêt");
-            changeButton(toggleButton, "green", "Démarrer");
+            changeButton(btnToggle, "green", "Démarrer");
         }
     });
 }
@@ -129,10 +130,10 @@ function main() {
 // prettier-ignore
 function humanReadableDate(date) {
     if (date == null) return "";
-    return `${date?.getFullYear()}/${date?.getMonth() + 1}/${date?.getDate()} ${
-            Number(date?.getHours())   < 10 ? "0" + date?.getHours()   : date?.getHours()}:${
-            Number(date?.getMinutes()) < 10 ? "0" + date?.getMinutes() : date?.getMinutes()}:${
-            Number(date?.getSeconds()) < 10 ? "0" + date?.getSeconds() : date?.getSeconds()}`;
+    return `${date.getFullYear?.()}/${date.getMonth?.() + 1}/${date.getDate?.()} ${
+            Number(date.getHours?.())   < 10 ? "0" + date.getHours?.()   : date.getHours?.()}:${
+            Number(date.getMinutes?.()) < 10 ? "0" + date.getMinutes?.() : date.getMinutes?.()}:${
+            Number(date.getSeconds?.()) < 10 ? "0" + date.getSeconds?.() : date.getSeconds?.()}`;
 }
 
 /**
@@ -144,10 +145,12 @@ function humanReadableDate(date) {
 function changeButton(button, color, text = "OK") {
     if (color === "green") {
         button.innerText = text;
+        button.classList.remove("btn-primary");
         button.classList.remove("btn-danger");
         button.classList.add("btn-success");
     } else if (color === "red") {
         button.innerText = text;
+        button.classList.remove("btn-primary");
         button.classList.remove("btn-success");
         button.classList.add("btn-danger");
     } else {

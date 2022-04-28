@@ -40,54 +40,52 @@ parser.on("data", async data => {
 /* GET home page. */
 router.get("/", async function (req, res, next) {
     res.render("index");
-    //let result = await prisma.mesure.findMany({});
-    //    console.table(result);
+});
+
+/* Envoie l'état du boolean  */
+router.post("/", (req, res) => {
+    res.json({ serverRecording: recording });
 });
 
 /* GET db page. */
 router.get("/db", async function (req, res, next) {
     res.render("db");
-    //let result = await prisma.mesure.findMany({});
-    //    console.table(result);
 });
 
-router.post("/", (req, res) => {
-    res.json({ serverRecording: recording });
-});
-
-/* Envoie toutes les secondes l'état du boolean "recording" et la dernière mesure prise */
+/* Envoie au client la dernière mesure prise et (éventuellement) la mesure enregistrée dans la database */
 router.post("/api/fetch", (req, res) => {
-    res.json({ mesure: lastMesure, dbRecord: dbMesure });
+    res.json({ mesure: lastMesure, dbRecord: dbMesure /*, currentState: recording*/ });
 });
 
-/* Permet de changer l'état du boolean "recording" du côté serveur pour lancer/arrêter
-   l'enregistrement de données dans la db.
-*/
+/* Réception du côté serveur de l'état du boolean "recording" se trouvant côté client. */
 router.post("/api/toggle", async (req, res) => {
-    if (recording && dbCurrentRecord != null) {
-        const updatedRecord = await prisma.record.update({
-            where: {
-                id: dbCurrentRecord.id,
-            },
-            data: {
-                fin: new Date(Date.now()),
-            },
-        });
-        console.log("==> Fin de l'enregistrement #" + dbCurrentRecord.id);
-        console.log(updatedRecord);
-        dbCurrentRecord = null;
-        dbMesure = null;
-    } else {
+    recording = req.body.clientRecording;
+    if (recording && dbCurrentRecord == null) {
         parser.once("data", async () => {
             const record = await prisma.record.create({
-                data: {},
+                data: {
+                    remarques: req.body.notes,
+                },
             });
             dbCurrentRecord = record;
             console.log("==> Début de l'enregistrement #" + dbCurrentRecord.id);
             console.log(record);
         });
+    } else if (dbCurrentRecord != null) {
+        const updatedRecord = await prisma.record.update({
+            where: {
+                id: dbCurrentRecord?.id,
+            },
+            data: {
+                end: new Date(Date.now()),
+            },
+        });
+        console.log("==> Fin de l'enregistrement #" + dbCurrentRecord.id);
+        console.log(updatedRecord);
+        /* RÀZ des variables stockant  */
+        dbCurrentRecord = null;
+        dbMesure = null;
     }
-    recording = req.body.recording;
 });
 
 router.post("/api/db", async (req, res) => {

@@ -8,10 +8,11 @@ datasource db {
 }
 
 model Record {
-    id      Int       @id @default(autoincrement())
-    start   DateTime  @default(now())
-    fin     DateTime?
-    mesures Mesure[]
+    id        Int       @id @default(autoincrement())
+    start     DateTime  @default(now())
+    end       DateTime?
+    remarques String?
+    mesures   Mesure[]
 }
 
 model Mesure {

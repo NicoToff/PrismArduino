@@ -1,13 +1,15 @@
 {% extends 'layout.twig' %}
 
 {% block scripts %}
-<script defer src="/javascripts/refresh.js"></script>
+<script defer src="/javascripts/index.js"></script>
 {% endblock scripts %}
 
 {% block body %}
 <h1>Enregistrement</h1>
 <p>Mesure reçue : <span id="mesure-lue"><small>Loading</small></span></p>
 <p>Enregistrement : <span id="enregistrement">Arrêt</span></p>
+<textarea class="mb-2" name="notes" id="notes" cols="30" rows="2" placeholder="Commentaires"
+    style="resize:none"></textarea>
 <div>
     <button class="btn btn-success" id="toggle-button">Démarrer</button>
 </div>
