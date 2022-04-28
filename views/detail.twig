@@ -1,0 +1,31 @@
+{% extends "layout.twig" %}
+
+{% block body %}
+
+<h1 class="text-center p-3 text-light">Enregistrement #{{record.id}}</h1>
+
+<h3 class="p-3 text-light">Remarque : {{record.remarques}}</h3>
+
+<div class="card border-primary bg-secondary text-light">
+    <h3 class="m-3">Mesures</h3>
+    <table id="result-table" class="table text-light" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>Horodatage</th>
+                <th>Mesure</th>
+            </tr>
+        </thead>
+        <tbody id="result-table-body">
+
+            {% for mesure in mesures %}
+            <tr>
+                <td>{{ mesure.horodatage | date("Y/m/d H:m:s") }}</td>
+                <td>{{ mesure.mesure }}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+{% endblock body %}

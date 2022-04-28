@@ -5,15 +5,51 @@
 {% endblock scripts %}
 
 {% block body %}
-<h1>Enregistrement</h1>
-<p>Mesure reçue : <span id="mesure-lue"><small>Loading</small></span></p>
-<p>Enregistrement : <span id="enregistrement">Arrêt</span></p>
-<textarea class="mb-2" name="notes" id="notes" cols="30" rows="2" placeholder="Commentaires"
-    style="resize:none"></textarea>
-<div>
-    <button class="btn btn-success" id="toggle-button">Démarrer</button>
+<h1 class="text-center p-3 text-light">Acquisition</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-7">
+            <div class="card border-primary bg-primary text-center">
+                <div class="card-body" style="min-height: 3vw;">
+                    <h2 class="card-title">Mesure</h2>
+                    <p class="display-result">&nbsp;<span id="mesure-lue"><small>Loading</small></span>&nbsp;</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="card border-primary bg-secondary text-center">
+                <div class="card-body" style="min-height: 3vw;">
+                    <h4 class="card-title mb-4">Enregistrement</h4>
+                    <p class="display-result"><span id="mesure-lue"><span id="enregistrement">Arrêt</span></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <div class="form-group mt-3">
+                <textarea class="form-control rounded-2" name="notes" id="notes" cols="20" rows="2" maxlength="30"
+                    placeholder="Commentaire pour la base de données (facultatif)" style="resize:none"></textarea>
+            </div>
+            <div>
+                <button class="btn btn-lg btn-block btn-success center" id="toggle-button">Démarrer</button>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card bg-light">
+                <div class="card-header">
+                    Nouvelles entrées
+                </div>
+                <div class="card-body">
+                    <textarea name="logger" id="logger" rows="15" readonly placeholder="Pas de données à afficher"
+                        style="resize:none;border: none;outline: none;width:100%;" class="bg-light"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="mt-3">Nouvelles entrées</div>
-<textarea name="logger" id="logger" cols="30" rows="10" readonly placeholder="Pas de données à afficher"
-    style="resize:none"></textarea>
+
+
+
+
 {% endblock %}

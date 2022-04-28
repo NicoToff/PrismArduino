@@ -1,3 +1,6 @@
+const navButtons = document.querySelectorAll("nav > a");
+navButtons[0].classList.add("active");
+
 const btnToggle = document.getElementById("toggle-button");
 btnToggle.setAttribute("disabled", true);
 const txtNewEntries = document.querySelector("#logger");

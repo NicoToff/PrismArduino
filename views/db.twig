@@ -5,8 +5,43 @@
 {% endblock scripts %}
 
 {% block body %}
-<h1>Consultation de la DB</h1>
-<div>
+<h1 class="text-center p-3 text-light">Consultation</h1>
+
+<div class="card border-primary bg-secondary text-light">
+    <h3 class="m-3">Historique</h3>
+    <table id="result-table" class="table text-light" style="width: 100%;">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>Stop</th>
+                <th>Remarques</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="result-table-body">
+
+            {% for record in dbRecords %}
+            <tr>
+                <td>{{ record.start | date("Y/m/d H:m:s") }}</td>
+                <td>{% if record.end == null %}
+                    {{ "" }}
+                    {% else %}
+                    {{ record.end | date("Y/m/d H:m:s") }}
+                    {% endif %}
+                </td>
+                <td>{{ record.remarques }}</td>
+                <td name="button-area">
+                    <a class="btn btn-warning" href="/db/{{record.id}}">&#x1F50E;</a>
+                    <a class="btn btn-danger">&#x1F5D1;</a>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+</div>
+
+{# <div>
     <label for="search">Search</label>
     <input type="text" name="search" id="db-search" placeholder="id de l'enregistrement">
     <button class="btn btn-primary" id="search-button">Go</button>
@@ -22,5 +57,5 @@
         <tbody id="result-table-body">
         </tbody>
     </table>
-</div>
+</div> #}
 {% endblock body %}

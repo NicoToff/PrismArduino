@@ -6,10 +6,12 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/style.css">
     <script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
@@ -20,14 +22,15 @@
     {% block scripts %}{% endblock scripts %}
 </head>
 
-<body>
-    <nav class="nav justify-content-center">
-        <a class="nav-item nav-link" href="/">Enregistrer</a>
-        <a class="nav-item nav-link" href="/db">Consulter</a>
+<body class="bg-dark">
+    <nav class="nav justify-content-center navbar navbar-expand-sm bg-info">
+        <a class="btn btn-light m-1 nav-item nav-link text-danger font-weight-bold" href="/">&#x1F4BE; Acquérir</a>
+        <a class="btn btn-light m-1 nav-item nav-link text-danger font-weight-bold" href="/db">&#x1F50D; Consulter</a>
     </nav>
 
     <div class="container">
         {% block body %}{% endblock %}
+        <footer class="text-light m-3">&copy; Nicolas Toffolo - HELHa - 2022</footer>
     </div>
 </body>
 

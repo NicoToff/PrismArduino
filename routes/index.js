@@ -47,14 +47,9 @@ router.post("/", (req, res) => {
     res.json({ serverRecording: recording });
 });
 
-/* GET db page. */
-router.get("/db", async function (req, res, next) {
-    res.render("db");
-});
-
 /* Envoie au client la dernière mesure prise et (éventuellement) la mesure enregistrée dans la database */
 router.post("/api/fetch", (req, res) => {
-    res.json({ mesure: lastMesure, dbRecord: dbMesure /*, currentState: recording*/ });
+    res.json({ mesure: lastMesure, dbRecord: dbMesure });
 });
 
 /* Réception du côté serveur de l'état du boolean "recording" se trouvant côté client. */
@@ -86,17 +81,6 @@ router.post("/api/toggle", async (req, res) => {
         dbCurrentRecord = null;
         dbMesure = null;
     }
-});
-
-router.post("/api/db", async (req, res) => {
-    const searchId = req.body.search;
-    const mesuresFound = await prisma.mesure.findMany({
-        where: {
-            idRecord: searchId,
-        },
-    });
-    console.table(mesuresFound);
-    res.json(mesuresFound);
 });
 
 module.exports = router;
