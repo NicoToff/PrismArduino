@@ -17,3 +17,7 @@ h4 {
 .display-result {
     font-size: 2rem;
 }
+
+.concealed {
+    visibility: hidden;
+}

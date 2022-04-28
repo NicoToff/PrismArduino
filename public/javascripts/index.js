@@ -1,8 +1,10 @@
-const navButtons = document.querySelectorAll("nav > a");
-navButtons[0].classList.add("active");
+navAcquerir.classList.add("active");
 
 const btnToggle = document.getElementById("toggle-button");
 btnToggle.setAttribute("disabled", true);
+setTimeout(() => {
+    btnToggle.removeAttribute("disabled");
+}, 1000);
 const txtNewEntries = document.querySelector("#logger");
 const lblMesureLue = document.getElementById("mesure-lue");
 const txtNotes = document.getElementById("notes");
@@ -11,28 +13,22 @@ const lblEnregistrement = document.getElementById("enregistrement");
 let newEntriesBuffer = "";
 let recording; // Boolean
 
-let serverRequest;
-serverRequest = new XMLHttpRequest();
-serverRequest.onreadystatechange = () => {
-    if (serverRequest.readyState === 4) {
-        try {
-            let response = JSON.parse(serverRequest.response);
-            recording = response.serverRecording;
-            if (recording) {
-                lblEnregistrement.textContent = "En cours...";
-                /* In jQuery */
-                // $("#enregistrement").text("En cours...");
-                changeButton(btnToggle, "red", "Arrêter");
-            }
-            main();
-        } catch (error) {
-            location.reload();
+isRecording(res => {
+    try {
+        let response = JSON.parse(res);
+        recording = response.serverRecording;
+        if (recording) {
+            lblEnregistrement.textContent = "En cours...";
+            /* In jQuery */
+            // $("#enregistrement").text("En cours...");
+            changeButton(btnToggle, "red", "Arrêter");
         }
+        body.classList.remove("concealed");
+        main();
+    } catch (error) {
+        location.reload();
     }
-};
-serverRequest.open("POST", "/", true);
-serverRequest.setRequestHeader("Content-type", "application/json");
-serverRequest.send();
+});
 
 // $.ajax({
 //     type: "post",
@@ -62,7 +58,7 @@ function main() {
                 try {
                     response = JSON.parse(serverRequest.response);
                     lblMesureLue.textContent = response?.mesure;
-                    btnToggle.removeAttribute("disabled");
+
                     if (recording && response?.dbRecord != null) {
                         const date = new Date(response.dbRecord?.horodatage);
                         newEntriesBuffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
@@ -102,6 +98,9 @@ function main() {
 
     btnToggle.addEventListener("click", () => {
         btnToggle.setAttribute("disabled", true);
+        setTimeout(() => {
+            btnToggle.removeAttribute("disabled"); // Ce delay évite de spammer le bouton
+        }, 2000);
         recording = !recording;
 
         let postActivity = new XMLHttpRequest();

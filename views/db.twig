@@ -2,6 +2,7 @@
 
 {% block scripts %}
 <script defer src="/javascripts/db.js"></script>
+{% include "_datatablePackage.twig" %}
 {% endblock scripts %}
 
 {% block body %}
@@ -32,9 +33,11 @@
                 <td>{{ record.remarques }}</td>
                 <td name="button-area">
                     <a class="btn btn-warning" href="/db/{{record.id}}">&#x1F50E;</a>
-                    <form action="/db/{{record.id}}?_method=DELETE" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">&#x1F5D1;</button>
-                    </form>
+                    <div title="Arrêter l'acquisition pour supprimer" id="tooltip" style="display:inline;">
+                        <form action="/db/{{record.id}}?_method=DELETE" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-danger" id="delete-button" disabled>&#x1F5D1;</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}

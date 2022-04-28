@@ -1,5 +1,10 @@
 {% extends "layout.twig" %}
 
+{% block scripts %}
+<script defer src="/javascripts/db.js"></script>
+{% include "_datatablePackage.twig" %}
+{% endblock scripts %}
+
 {% block body %}
 
 <h1 class="text-center p-3 text-light">Enregistrement #{{record.id}}</h1>
@@ -27,5 +32,4 @@
         </tbody>
     </table>
 </div>
-
 {% endblock body %}

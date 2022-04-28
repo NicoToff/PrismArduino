@@ -1,5 +1,23 @@
-const navButtons = document.querySelectorAll("nav > a");
-navButtons[1].classList.add("active");
+navConsulter.classList.add("active");
+
+const btnDelete = document.querySelectorAll("#delete-button");
+const tooltip = document.querySelector("#tooltip");
+
+isRecording(res => {
+    try {
+        let response = JSON.parse(res);
+        recording = response.serverRecording;
+        if (!recording) {
+            btnDelete?.forEach(btn => {
+                btn.removeAttribute("disabled");
+            });
+            tooltip?.removeAttribute("title");
+        }
+        body.classList.remove("concealed");
+    } catch (error) {
+        location.reload();
+    }
+});
 
 // let postSearch = new XMLHttpRequest();
 // postSearch.onreadystatechange = () => {

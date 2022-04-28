@@ -1,0 +1,1 @@
+$("#result-table").DataTable();
