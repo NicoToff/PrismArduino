@@ -2,7 +2,8 @@
 
 {% block scripts %}
 <script defer src="/javascripts/db.js"></script>
-{% include "_datatablePackage.twig" %}
+<script defer type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.11.5/datatables.min.js"></script>
+<script defer src="/javascripts/dataTable.js"></script>
 {% endblock scripts %}
 
 {% block body %}
@@ -20,28 +21,32 @@
             </tr>
         </thead>
         <tbody id="result-table-body">
-
             {% for record in dbRecords %}
             <tr>
-                <td>{{ record.start | date("Y/m/d H:m:s") }}</td>
+                <td>{{ record.start | date("Y/m/d H:i:s") }}</td>
                 <td>{% if record.end == null %}
-                    {{ "" }}
+                    {{ "" }} {# Si une date est "null", twig envoie par défaut l'heure actuelle... #}
                     {% else %}
-                    {{ record.end | date("Y/m/d H:m:s") }}
+                    {{ record.end | date("Y/m/d H:i:s") }}
                     {% endif %}
                 </td>
                 <td>{{ record.remarques }}</td>
                 <td name="button-area">
+                    {# Le bouton envoie un GET avec le n° d'enregistrement correspondant #}
                     <a class="btn btn-warning" href="/db/{{record.id}}">&#x1F50E;</a>
-                    <div title="Arrêter l'acquisition pour supprimer" id="tooltip" style="display:inline;">
+                    <div title="Arrêter l'acquisition pour supprimer" name="tooltip" style="display:inline;">
+                        {# J'utilise le package "method-override" pour envoyer une méthode DELETE #}
                         <form action="/db/{{record.id}}?_method=DELETE" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger" id="delete-button" disabled>&#x1F5D1;</button>
+                            <button type="submit" class="btn btn-danger" name="delete-button"
+                                disabled>&#x1F5D1;</button>
+                            {# Le bouton de suppression est "disabled" par défaut. Il est activé au chargement de la
+                            page uniquement si on n'est pas en train d'enregistrer des données dans la DB.
+                            Le serveur a tendance a crashé si on supprime quoi que ce soit durant un enregistrement. #}
                         </form>
                     </div>
                 </td>
             </tr>
             {% endfor %}
-
         </tbody>
     </table>
 </div>

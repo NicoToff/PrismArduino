@@ -3,15 +3,17 @@
 
 <head>
     <title>Mesures Arduino</title>
-    <!-- Required meta tags -->
+    {# Metatags #}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
 
-    <!-- Bootstrap CSS -->
+    {# Bootstrap CSS #}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    {# My CSS #}
     <link rel="stylesheet" href="/stylesheets/style.css">
+    {# Bootstrap JS #}
     <script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
@@ -19,7 +21,9 @@
     <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    {# Global variables and functions #}
     <script defer src="/javascripts/_master.js"></script>
+
     {% block scripts %}{% endblock scripts %}
 </head>
 
@@ -31,8 +35,14 @@
 
     <div class="container">
         {% block body %}{% endblock %}
-        <footer class="text-light m-3">&copy; Nicolas Toffolo - HELHa - 2022</footer>
     </div>
+    <footer class="footerrr font-small bg-info mt-5">
+        <div class="text-center p-3">
+            &copy; <a class="btn btn-sm btn-primary" href="https://github.com/NicoToff">Nicolas Toffolo</a> - HELHa -
+            2022
+        </div>
+    </footer>
+
 </body>
 
 </html>

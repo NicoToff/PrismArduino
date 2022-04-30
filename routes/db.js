@@ -1,9 +1,8 @@
+"use strict";
 const express = require("express");
 const router = express.Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
-// let records;
 
 /* GET db page. */
 router.get("/", async function (req, res, next) {
@@ -11,11 +10,7 @@ router.get("/", async function (req, res, next) {
     res.render("db", { dbRecords: records });
 });
 
-// router.post("/", function (req, res, next) {
-//     res.json({ dbRecords: records });
-//     console.log(records);
-// });
-
+// Avec ":id", on récupère la valeur qui se trouve derrière le "/" dans la propriété "req.params.id"
 router.get("/:id", async (req, res) => {
     try {
         const id = Number(req.params.id);
@@ -38,33 +33,25 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const id = Number(req.params.id);
+        // Suppression de toutes les mesures dans l'enregistrement
         const mesuresFound = await prisma.mesure.deleteMany({
             where: {
                 idRecord: id,
             },
         });
+        console.log(`${mesuresFound.count} mesures supprimées.`);
+        // Suppression de l'enregistrement
         const recordFound = await prisma.record.delete({
             where: {
                 id: id,
             },
         });
-        console.table(mesuresFound);
-        console.log(recordFound);
+        console.log(`Enregistrement #${recordFound.id} supprimé.`);
         res.redirect("/db");
     } catch (error) {
         console.log(error);
         res.redirect("/db");
     }
 });
-// router.post("/api/db", async (req, res) => {
-//     const searchId = req.body.search;
-//     const mesuresFound = await prisma.mesure.findMany({
-//         where: {
-//             idRecord: searchId,
-//         },
-//     });
-//     console.table(mesuresFound);
-//     res.json(mesuresFound);
-// });
 
 module.exports = router;

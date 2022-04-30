@@ -32,24 +32,21 @@
                     placeholder="Commentaire pour la base de données (facultatif)" style="resize:none"></textarea>
             </div>
             <div>
-                <button class="btn btn-lg btn-block btn-success center" id="toggle-button">Démarrer</button>
+                <button class="btn btn-lg btn-block btn-success center" id="toggle-button" disabled>Démarrer</button>
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-4" id="logger-card">
             <div class="card bg-light">
                 <div class="card-header">
                     Nouvelles entrées
                 </div>
                 <div class="card-body">
-                    <textarea name="logger" id="logger" rows="15" readonly placeholder="Pas de données à afficher"
-                        style="resize:none;border: none;outline: none;width:100%;" class="bg-light"></textarea>
+                    <textarea name="logger" id="logger" rows="15" placeholder="Pas de données à afficher"
+                        style="resize:none;border: none;outline: none;width:100%;" class="bg-light" readonly></textarea>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
 
 {% endblock %}

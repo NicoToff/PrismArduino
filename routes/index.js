@@ -1,9 +1,9 @@
+"use strict";
 const express = require("express");
 const router = express.Router();
-// See https://serialport.io/docs/guide-usage
-const { SerialPort } = require("serialport");
-// See https://serialport.io/docs/api-parser-readline
-const { ReadlineParser } = require("@serialport/parser-readline");
+
+const { SerialPort } = require("serialport"); // See https://serialport.io/docs/guide-usage
+const { ReadlineParser } = require("@serialport/parser-readline"); // See https://serialport.io/docs/api-parser-readline
 
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
@@ -42,17 +42,19 @@ router.get("/", async function (req, res, next) {
     res.render("index");
 });
 
-/* Envoie l'état du boolean  */
+/* Envoie l'état du boolean recording */
 router.post("/", (req, res) => {
     res.json({ serverRecording: recording });
 });
 
-/* Envoie au client la dernière mesure prise et (éventuellement) la mesure enregistrée dans la database */
+/* Envoie au client la dernière mesure prise et (éventuellement) la dernière mesure enregistrée dans la database 
+   En pratique, les deux valeurs doivent évidemment correspondre */
 router.post("/api/fetch", (req, res) => {
-    res.json({ mesure: lastMesure, dbRecord: dbMesure });
+    res.json({ mesure: lastMesure, dbMesure: dbMesure });
 });
 
-/* Réception du côté serveur de l'état du boolean "recording" se trouvant côté client. */
+/* Réception du côté serveur de l'état du boolean "recording" se trouvant côté client
+   et lancement ou arrêt de l'enregistrement */
 router.post("/api/toggle", async (req, res) => {
     recording = req.body.clientRecording;
     if (recording && dbCurrentRecord == null) {
@@ -77,7 +79,7 @@ router.post("/api/toggle", async (req, res) => {
         });
         console.log("==> Fin de l'enregistrement #" + dbCurrentRecord.id);
         console.log(updatedRecord);
-        /* RÀZ des variables stockant  */
+        /* RÀZ des variables stockant l'enregistrement et la dernière mesure */
         dbCurrentRecord = null;
         dbMesure = null;
     }

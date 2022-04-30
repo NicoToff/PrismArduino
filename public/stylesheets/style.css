@@ -14,10 +14,20 @@ h4 {
     font-size: 2vw;
 }
 
+th {
+    font-size: 1.5rem;
+}
+
 .display-result {
     font-size: 2rem;
 }
 
 .concealed {
     visibility: hidden;
+}
+
+@media screen and (max-width: 767px) {
+    #logger-card {
+        display: none;
+    }
 }

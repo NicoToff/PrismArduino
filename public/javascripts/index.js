@@ -1,10 +1,7 @@
+"use strict";
 navAcquerir.classList.add("active");
 
 const btnToggle = document.getElementById("toggle-button");
-btnToggle.setAttribute("disabled", true);
-setTimeout(() => {
-    btnToggle.removeAttribute("disabled");
-}, 1000);
 const txtNewEntries = document.querySelector("#logger");
 const lblMesureLue = document.getElementById("mesure-lue");
 const txtNotes = document.getElementById("notes");
@@ -13,20 +10,20 @@ const lblEnregistrement = document.getElementById("enregistrement");
 let newEntriesBuffer = "";
 let recording; // Boolean
 
-isRecording(res => {
+recordingState(serverRecording => {
     try {
-        let response = JSON.parse(res);
-        recording = response.serverRecording;
+        recording = serverRecording;
         if (recording) {
             lblEnregistrement.textContent = "En cours...";
             /* In jQuery */
             // $("#enregistrement").text("En cours...");
             changeButton(btnToggle, "red", "Arrêter");
         }
+        btnToggle.removeAttribute("disabled");
         body.classList.remove("concealed");
         main();
     } catch (error) {
-        location.reload();
+        setTimeout(() => location.reload(), 1000);
     }
 });
 
@@ -47,31 +44,32 @@ isRecording(res => {
 // });
 
 function main() {
-    // setInterval() se lance toutes les xxx millisecondes; ici 1000
+    // Toutes les secondes...
     setInterval(() => {
-        // Demander au serveur...
+        // ... (1) on demande au serveur ...
         let serverRequest = new XMLHttpRequest();
         serverRequest.onreadystatechange = () => {
             if (serverRequest.readyState === 4) {
-                let response;
-                //                console.log(`Server's recording: ${JSON.parse(serverRequest.response).currentState}`);
+                let response = {};
                 try {
+                    // (3) ... puis on traite la réponse ...
                     response = JSON.parse(serverRequest.response);
                     lblMesureLue.textContent = response?.mesure;
 
-                    if (recording && response?.dbRecord != null) {
-                        const date = new Date(response.dbRecord?.horodatage);
-                        newEntriesBuffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
+                    if (recording && response?.dbMesure != null) {
+                        const date = new Date(response.dbMesure?.horodatage);
+                        newEntriesBuffer += `${humanReadableDate(date)} => ${response?.dbMesure?.mesure}\n`;
                         txtNewEntries.textContent = newEntriesBuffer;
                         txtNewEntries.scrollTop = txtNewEntries.scrollHeight; // Scroll to bottom
                     }
                 } catch (error) {
-                    response = {};
+                    // (3bis) ou un message d'erreur si la réponse n'était pas parsable.
                     lblMesureLue.innerHTML = "<small>Server unreachable</small> ";
                     btnToggle.setAttribute("disabled", true);
                 }
             }
         };
+        // ... (2) d'aller chercher la dernière mesure prise et (éventuellement) la mesure enregistrée dans la database ...
         serverRequest.open("POST", "/api/fetch", true);
         serverRequest.setRequestHeader("Content-type", "application/json");
         serverRequest.send();
@@ -86,9 +84,9 @@ function main() {
         //         // ... réactive le bouton.
         //         toggleButton.removeAttribute("disabled");
 
-        //         if (recording && response?.dbRecord != null) {
-        //             const date = new Date(response.dbRecord?.horodatage);
-        //             buffer += `${humanReadableDate(date)} => ${response?.dbRecord?.mesure}\n`;
+        //         if (recording && response?.dbMesure != null) {
+        //             const date = new Date(response.dbMesure?.horodatage);
+        //             buffer += `${humanReadableDate(date)} => ${response?.dbMesure?.mesure}\n`;
         //             logger.textContent = buffer;
         //             logger.scrollTop = logger.scrollHeight;
         //         }
@@ -98,17 +96,16 @@ function main() {
 
     btnToggle.addEventListener("click", () => {
         btnToggle.setAttribute("disabled", true);
-        setTimeout(() => {
-            btnToggle.removeAttribute("disabled"); // Ce delay évite de spammer le bouton
-        }, 2000);
+        setTimeout(() => btnToggle.removeAttribute("disabled"), 2000); // Ce retard évite de spammer le bouton (le serveur le prend mal)
         recording = !recording;
 
-        let postActivity = new XMLHttpRequest();
-        postActivity.open("POST", "/api/toggle", true);
-        postActivity.setRequestHeader("Content-type", "application/json");
-        postActivity.send(JSON.stringify({ clientRecording: recording, notes: txtNotes.value }));
+        // Envoi du boolean "recording" au serveur
+        let sendRecording = new XMLHttpRequest();
+        sendRecording.open("POST", "/api/toggle", true);
+        sendRecording.setRequestHeader("Content-type", "application/json");
+        sendRecording.send(JSON.stringify({ clientRecording: recording, notes: txtNotes.value }));
         /* In jQuery */
-        // $.post("/api/toggle", {activity: recording});
+        // $.post("/api/toggle", { clientRecording: recording, notes: txtNotes.value });
 
         if (recording) {
             lblEnregistrement.textContent = "En cours...";
@@ -125,9 +122,9 @@ function main() {
 }
 
 /**
- * Given a Date, returns a string with a "YYYY/MM/DD HH:mm:ss" format.
+ * Avec une date, renvoie une string au format "YYYY/MM/DD HH:mm:ss".
  * @param {Date} date
- * @returns A string in a format like so: "2022/4/26 12:54:56"
+ * @returns Une string de ce genre: "2022/4/26 12:54:56"
  */
 // prettier-ignore
 function humanReadableDate(date) {
@@ -139,10 +136,10 @@ function humanReadableDate(date) {
 }
 
 /**
- * Changes the aspect of a button
- * @param {HTMLButtonElement} button A button object
- * @param {string} color Valid = "red", "green" (defaults to blue)
- * @param {string} text The new text for the button (defaults to "OK")
+ * Change l'aspect d'un bouton
+ * @param {HTMLButtonElement} button Un bouton
+ * @param {string} color Valide = "red", "green" (sinon, sera bleu par défaut)
+ * @param {string} text Le nouveau texte pour le bouton (sinon sera "OK" par défaut)
  */
 function changeButton(button, color, text = "OK") {
     if (color === "green") {

@@ -1,17 +1,14 @@
+"use strict";
 navConsulter.classList.add("active");
 
-const btnDelete = document.querySelectorAll("#delete-button");
-const tooltip = document.querySelector("#tooltip");
+const btnDelete = document.getElementsByName("delete-button");
+const tooltip = document.getElementsByName("tooltip");
 
-isRecording(res => {
+recordingState(recording => {
     try {
-        let response = JSON.parse(res);
-        recording = response.serverRecording;
         if (!recording) {
-            btnDelete?.forEach(btn => {
-                btn.removeAttribute("disabled");
-            });
-            tooltip?.removeAttribute("title");
+            btnDelete?.forEach(btn => btn.removeAttribute("disabled"));
+            tooltip?.forEach(tt => tt.removeAttribute("title"));
         }
         body.classList.remove("concealed");
     } catch (error) {
