@@ -1,1 +1,3 @@
-$("#result-table").DataTable();
+$(function () {
+    $("#result-table").DataTable();
+});
